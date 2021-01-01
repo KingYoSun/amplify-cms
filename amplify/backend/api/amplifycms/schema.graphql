@@ -1,0 +1,20 @@
+type User @model {
+  id: ID!
+  cognitoID: String!
+  identityID: String
+  name: String!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  posts: [Post] @connection(keyName: "byUser", fields: ["id"])
+}
+
+type Post @model @key(name: "byUser", fields: ["userID"]) {
+  id: ID!
+  title: String!
+  contentUrl: String
+  userID: ID!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+  user: User @connection(fields: ["userID"])
+}
+
