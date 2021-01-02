@@ -8,6 +8,10 @@ export const onCreateUser = /* GraphQL */ `
       cognitoID
       identityID
       name
+      viewName
+      email
+      description
+      iconUrl
       createdAt
       updatedAt
       posts {
@@ -31,6 +35,10 @@ export const onUpdateUser = /* GraphQL */ `
       cognitoID
       identityID
       name
+      viewName
+      email
+      description
+      iconUrl
       createdAt
       updatedAt
       posts {
@@ -54,6 +62,10 @@ export const onDeleteUser = /* GraphQL */ `
       cognitoID
       identityID
       name
+      viewName
+      email
+      description
+      iconUrl
       createdAt
       updatedAt
       posts {
@@ -84,6 +96,10 @@ export const onCreatePost = /* GraphQL */ `
         cognitoID
         identityID
         name
+        viewName
+        email
+        description
+        iconUrl
         createdAt
         updatedAt
         posts {
@@ -107,6 +123,10 @@ export const onUpdatePost = /* GraphQL */ `
         cognitoID
         identityID
         name
+        viewName
+        email
+        description
+        iconUrl
         createdAt
         updatedAt
         posts {
@@ -130,12 +150,91 @@ export const onDeletePost = /* GraphQL */ `
         cognitoID
         identityID
         name
+        viewName
+        email
+        description
+        iconUrl
         createdAt
         updatedAt
         posts {
           nextToken
         }
       }
+    }
+  }
+`;
+export const onCreateAdmin = /* GraphQL */ `
+  subscription OnCreateAdmin {
+    onCreateAdmin {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        identityID
+        name
+        viewName
+        email
+        description
+        iconUrl
+        createdAt
+        updatedAt
+        posts {
+          nextToken
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onUpdateAdmin = /* GraphQL */ `
+  subscription OnUpdateAdmin {
+    onUpdateAdmin {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        identityID
+        name
+        viewName
+        email
+        description
+        iconUrl
+        createdAt
+        updatedAt
+        posts {
+          nextToken
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onDeleteAdmin = /* GraphQL */ `
+  subscription OnDeleteAdmin {
+    onDeleteAdmin {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        identityID
+        name
+        viewName
+        email
+        description
+        iconUrl
+        createdAt
+        updatedAt
+        posts {
+          nextToken
+        }
+      }
+      createdAt
+      updatedAt
     }
   }
 `;

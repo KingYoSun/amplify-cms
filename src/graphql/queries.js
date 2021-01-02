@@ -8,6 +8,10 @@ export const getUser = /* GraphQL */ `
       cognitoID
       identityID
       name
+      viewName
+      email
+      description
+      iconUrl
       createdAt
       updatedAt
       posts {
@@ -36,6 +40,10 @@ export const listUsers = /* GraphQL */ `
         cognitoID
         identityID
         name
+        viewName
+        email
+        description
+        iconUrl
         createdAt
         updatedAt
         posts {
@@ -60,6 +68,10 @@ export const getPost = /* GraphQL */ `
         cognitoID
         identityID
         name
+        viewName
+        email
+        description
+        iconUrl
         createdAt
         updatedAt
         posts {
@@ -88,8 +100,100 @@ export const listPosts = /* GraphQL */ `
           cognitoID
           identityID
           name
+          viewName
+          email
+          description
+          iconUrl
           createdAt
           updatedAt
+        }
+      }
+      nextToken
+    }
+  }
+`;
+export const getAdmin = /* GraphQL */ `
+  query GetAdmin($id: ID!) {
+    getAdmin(id: $id) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        identityID
+        name
+        viewName
+        email
+        description
+        iconUrl
+        createdAt
+        updatedAt
+        posts {
+          nextToken
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listAdmins = /* GraphQL */ `
+  query ListAdmins(
+    $filter: ModelAdminFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listAdmins(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        userID
+        user {
+          id
+          cognitoID
+          identityID
+          name
+          viewName
+          email
+          description
+          iconUrl
+          createdAt
+          updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const userByCognitoId = /* GraphQL */ `
+  query UserByCognitoId(
+    $cognitoID: String
+    $sortDirection: ModelSortDirection
+    $filter: ModelUserFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    userByCognitoID(
+      cognitoID: $cognitoID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        cognitoID
+        identityID
+        name
+        viewName
+        email
+        description
+        iconUrl
+        createdAt
+        updatedAt
+        posts {
+          nextToken
         }
       }
       nextToken

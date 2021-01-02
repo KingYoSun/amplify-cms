@@ -1,8 +1,12 @@
-type User @model {
+type User @model @key(name: "byCognitoID", fields: ["cognitoID"], queryField: "userByCognitoID") {
   id: ID!
   cognitoID: String!
   identityID: String
   name: String!
+  viewName: String
+  email: String
+  description: String
+  iconUrl: String
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
   posts: [Post] @connection(keyName: "byUser", fields: ["id"])
@@ -18,3 +22,8 @@ type Post @model @key(name: "byUser", fields: ["userID"]) {
   user: User @connection(fields: ["userID"])
 }
 
+type Admin @model @key(name: "byUser", fields: ["userID"]){
+  id: ID!
+  userID: ID!
+  user: User @connection(fields: ["userID"])
+}

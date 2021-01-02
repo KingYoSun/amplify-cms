@@ -11,6 +11,10 @@ export const createUser = /* GraphQL */ `
       cognitoID
       identityID
       name
+      viewName
+      email
+      description
+      iconUrl
       createdAt
       updatedAt
       posts {
@@ -37,6 +41,10 @@ export const updateUser = /* GraphQL */ `
       cognitoID
       identityID
       name
+      viewName
+      email
+      description
+      iconUrl
       createdAt
       updatedAt
       posts {
@@ -63,6 +71,10 @@ export const deleteUser = /* GraphQL */ `
       cognitoID
       identityID
       name
+      viewName
+      email
+      description
+      iconUrl
       createdAt
       updatedAt
       posts {
@@ -96,6 +108,10 @@ export const createPost = /* GraphQL */ `
         cognitoID
         identityID
         name
+        viewName
+        email
+        description
+        iconUrl
         createdAt
         updatedAt
         posts {
@@ -122,6 +138,10 @@ export const updatePost = /* GraphQL */ `
         cognitoID
         identityID
         name
+        viewName
+        email
+        description
+        iconUrl
         createdAt
         updatedAt
         posts {
@@ -148,12 +168,100 @@ export const deletePost = /* GraphQL */ `
         cognitoID
         identityID
         name
+        viewName
+        email
+        description
+        iconUrl
         createdAt
         updatedAt
         posts {
           nextToken
         }
       }
+    }
+  }
+`;
+export const createAdmin = /* GraphQL */ `
+  mutation CreateAdmin(
+    $input: CreateAdminInput!
+    $condition: ModelAdminConditionInput
+  ) {
+    createAdmin(input: $input, condition: $condition) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        identityID
+        name
+        viewName
+        email
+        description
+        iconUrl
+        createdAt
+        updatedAt
+        posts {
+          nextToken
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateAdmin = /* GraphQL */ `
+  mutation UpdateAdmin(
+    $input: UpdateAdminInput!
+    $condition: ModelAdminConditionInput
+  ) {
+    updateAdmin(input: $input, condition: $condition) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        identityID
+        name
+        viewName
+        email
+        description
+        iconUrl
+        createdAt
+        updatedAt
+        posts {
+          nextToken
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteAdmin = /* GraphQL */ `
+  mutation DeleteAdmin(
+    $input: DeleteAdminInput!
+    $condition: ModelAdminConditionInput
+  ) {
+    deleteAdmin(input: $input, condition: $condition) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        identityID
+        name
+        viewName
+        email
+        description
+        iconUrl
+        createdAt
+        updatedAt
+        posts {
+          nextToken
+        }
+      }
+      createdAt
+      updatedAt
     }
   }
 `;
