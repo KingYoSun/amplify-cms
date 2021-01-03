@@ -5,7 +5,7 @@
         :dialog="showDialog"
         :message="dialogMessage"
         :cancel="false"
-        @agree="showDialog = !showDialog"
+        @agree="refresh"
         />
         <form ref="formProfile" @submit.prevent class="w-full max-w-screen-sm mx-4">
             <div class="my-2">
@@ -123,6 +123,11 @@ export default {
         this.getProfile()
     },
     methods: {
+        refresh () {
+            if (process.browser) {
+                window.location.reload(true)
+            }
+        },
         nuxtLink (link) {
             this.$router.push(link)
         },
