@@ -19,7 +19,28 @@ export default {
         return {
             editorText: "",
             editorOptions: {
-                hideModeSwitch: true
+                hideModeSwitch: true,
+                toolbarItems: [
+                    'heading',
+                    'bold',
+                    'italic',
+                    'strike',
+                    'divider',
+                    'hr',
+                    'quote',
+                    'divider',
+                    'ul',
+                    'ol',
+                    'task',
+                    'indent',
+                    'outdent',
+                    'divider',
+                    'table',
+                    'link',
+                    'divider',
+                    'code',
+                    'codeblock'
+                ]
             }
         }
     }
