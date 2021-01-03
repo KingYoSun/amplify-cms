@@ -26,11 +26,11 @@
                             {{ link.title }}
                         </nuxt-link>
                     </li>
-                    <li class="text-white" v-if="showProfileIcon">
+                    <li class="text-white">
                         <nuxt-link to="/profile">
                             <img
                             :src="$store.state.imgPreview"
-                            v-if="$store.state.showPreviewImg"
+                            v-if="showProfileIcon"
                             alt="ユーザアイコン"
                             @error="removeImg"
                             class="object-contain"
