@@ -220,9 +220,14 @@ export default {
                     }
                 `
                 API.graphql(graphqlOperation(createUser))
-                    .then((res)=> {
+                    .then(async (res)=> {
                         this.$store.commit('setUserID', id)
                         console.log("プロフィールを作成しました")
+                        await this.getUserInfo()
+                        if (this.isLoggedIn) {
+                            this.showProfileIcon = false
+                            this.showProfileIcon = true
+                        }
                     })
             } catch (e) {
                 console.log("プロフィールの作成に失敗しました: " + e)
