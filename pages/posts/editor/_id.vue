@@ -17,7 +17,7 @@
             <div class="my-1 mt-3" style="text-align: start;">
                 <span class="w-full">記事本文:</span>
             </div>
-            <div class="w-full" style="text-align: start;">
+            <div v-if="showEditor" class="w-full" style="text-align: start;">
                 <editor
                 :initialValue="editorText"
                 :options="editorOptions"
@@ -63,6 +63,7 @@ export default {
             showDialog: false,
             dialogMessage: "",
             newFlag: false,
+            showEditor: false,
             id: "",
             title: "",
             contentUrl: "",
@@ -102,10 +103,15 @@ export default {
         this.id = this.$route.params.id
         if ([null, undefined, "", "new"].indexOf(this.id) === -1) {
             await this.getPostAPI()
-            if (this.contentUrl !== "") await this.getPostS3()
+            if (this.contentUrl !== "") {
+                await this.getPostS3()
+            } else {
+                this.showEditor = true
+            }
         } else {
             this.id = nanoid()
             this.newFlag = true
+            this.showEditor = true
         }
     },
     methods: {
@@ -216,11 +222,10 @@ export default {
                 reader.readAsText(data.Body, 'utf-8')
                 reader.onload = () => {
                     this.editorText = reader.result
+                    this.showEditor = true
                 }
             } catch (e) {
                 console.log("Getting Image Failed: " + e)
-            } finally {
-                return obj
             }
         },
         async createPostAPI () {
