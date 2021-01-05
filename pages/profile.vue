@@ -108,6 +108,7 @@ export default {
                 imgPreview: null,
                 showPreviewImg: false,
             },
+            _version: 0,
             required: value => !!value || "必須事項です",
             maxFileSize: value => !value || value.size < 3*1024*1024 || 'ファイルサイズは3MB以下にしてください'
         }
@@ -157,6 +158,7 @@ export default {
                             email
                             description
                             iconUrl
+                            _version
                         }
                     }
                 }
@@ -168,6 +170,7 @@ export default {
                         this.id = ("id" in items) ? items.id : ""
                         this.viewName = ("viewName" in items) ? items.viewName : ""
                         this.description = ("description" in items) ? items.description.replace(/\\n/g, '\n') : ""
+                        this._version = ("_version" in items) ? items._version : 0
                         this.icon.imgURL = ("iconUrl" in items && items.iconUrl !== "") ? items.iconUrl : null
                         Common.setImgFile(this.icon)
                         this.overlay = false
@@ -212,6 +215,7 @@ export default {
         },
         async updateProfile () {
             this.overlay = true
+            this._version++
             const date = new Date()
             const nowUnix = Math.floor(date.getTime() / 1000)
             const updateUser = `
@@ -223,15 +227,17 @@ export default {
                     email: "${this.currentUserInfo.attributes.email}",
                     description: "${this.description.replace(/\n/g,'\\n')}",
                     iconUrl: "${this.icon.imgURL}",
-                    identityID: "${this.currentCredentials.identityId}"
+                    identityID: "${this.currentCredentials.identityId}",
+                    _version: ${this._version}
                 }) {
-                id
-                name
-                viewName
-                email
-                description
-                iconUrl
-                identityID
+                    id
+                    name
+                    viewName
+                    email
+                    description
+                    iconUrl
+                    identityID
+                    _version
                 }
             }
             `

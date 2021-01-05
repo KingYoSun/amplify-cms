@@ -1,3 +1,4 @@
+/* tslint:disable */
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
@@ -15,16 +16,12 @@ export const onCreateUser = /* GraphQL */ `
       createdAt
       updatedAt
       posts {
-        items {
-          id
-          title
-          contentUrl
-          userID
-          createdAt
-          updatedAt
-        }
         nextToken
+        startedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
     }
   }
 `;
@@ -42,16 +39,12 @@ export const onUpdateUser = /* GraphQL */ `
       createdAt
       updatedAt
       posts {
-        items {
-          id
-          title
-          contentUrl
-          userID
-          createdAt
-          updatedAt
-        }
         nextToken
+        startedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
     }
   }
 `;
@@ -69,16 +62,12 @@ export const onDeleteUser = /* GraphQL */ `
       createdAt
       updatedAt
       posts {
-        items {
-          id
-          title
-          contentUrl
-          userID
-          createdAt
-          updatedAt
-        }
         nextToken
+        startedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
     }
   }
 `;
@@ -102,10 +91,13 @@ export const onCreatePost = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
     }
   }
 `;
@@ -129,10 +121,13 @@ export const onUpdatePost = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
     }
   }
 `;
@@ -156,10 +151,13 @@ export const onDeletePost = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
     }
   }
 `;
@@ -179,10 +177,13 @@ export const onCreateAdmin = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -204,10 +205,13 @@ export const onUpdateAdmin = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -229,10 +233,13 @@ export const onDeleteAdmin = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }

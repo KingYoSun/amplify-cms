@@ -1,6 +1,40 @@
+/* tslint:disable */
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const syncUsers = /* GraphQL */ `
+  query SyncUsers(
+    $filter: ModelUserFilterInput
+    $limit: Int
+    $nextToken: String
+    $lastSync: AWSTimestamp
+  ) {
+    syncUsers(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      lastSync: $lastSync
+    ) {
+      items {
+        id
+        cognitoID
+        identityID
+        name
+        viewName
+        email
+        description
+        iconUrl
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;
 export const getUser = /* GraphQL */ `
   query GetUser($id: ID!) {
     getUser(id: $id) {
@@ -15,16 +49,12 @@ export const getUser = /* GraphQL */ `
       createdAt
       updatedAt
       posts {
-        items {
-          id
-          title
-          contentUrl
-          userID
-          createdAt
-          updatedAt
-        }
         nextToken
+        startedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
     }
   }
 `;
@@ -46,11 +76,41 @@ export const listUsers = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
       nextToken
+      startedAt
+    }
+  }
+`;
+export const syncPosts = /* GraphQL */ `
+  query SyncPosts(
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+    $lastSync: AWSTimestamp
+  ) {
+    syncPosts(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      lastSync: $lastSync
+    ) {
+      items {
+        id
+        title
+        contentUrl
+        userID
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
     }
   }
 `;
@@ -74,10 +134,13 @@ export const getPost = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
     }
   }
 `;
@@ -95,20 +158,39 @@ export const listPosts = /* GraphQL */ `
         userID
         createdAt
         updatedAt
-        user {
-          id
-          cognitoID
-          identityID
-          name
-          viewName
-          email
-          description
-          iconUrl
-          createdAt
-          updatedAt
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
       nextToken
+      startedAt
+    }
+  }
+`;
+export const syncAdmins = /* GraphQL */ `
+  query SyncAdmins(
+    $filter: ModelAdminFilterInput
+    $limit: Int
+    $nextToken: String
+    $lastSync: AWSTimestamp
+  ) {
+    syncAdmins(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      lastSync: $lastSync
+    ) {
+      items {
+        id
+        userID
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
     }
   }
 `;
@@ -128,10 +210,13 @@ export const getAdmin = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
+      _version
+      _deleted
+      _lastChangedAt
       createdAt
       updatedAt
     }
@@ -147,22 +232,14 @@ export const listAdmins = /* GraphQL */ `
       items {
         id
         userID
-        user {
-          id
-          cognitoID
-          identityID
-          name
-          viewName
-          email
-          description
-          iconUrl
-          createdAt
-          updatedAt
-        }
+        _version
+        _deleted
+        _lastChangedAt
         createdAt
         updatedAt
       }
       nextToken
+      startedAt
     }
   }
 `;
@@ -192,11 +269,12 @@ export const userByCognitoId = /* GraphQL */ `
         iconUrl
         createdAt
         updatedAt
-        posts {
-          nextToken
-        }
+        _version
+        _deleted
+        _lastChangedAt
       }
       nextToken
+      startedAt
     }
   }
 `;

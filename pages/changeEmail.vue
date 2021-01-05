@@ -91,6 +91,7 @@ export default {
             overlay: false,
             dialogMessage: "",
             code: "",
+            _version: 0,
             required: value => !!value || "必須事項です",
             validateEmail: value => patternEmail.test(value) || 'メールアドレスを入力してください',
             confirm: value => value == this.email || '確認用メールアドレス欄にも同様のメールアドレスを入力してください'
@@ -172,6 +173,7 @@ export default {
                     ) {
                         items {
                             id
+                            _version
                         }
                     }
                 }
@@ -181,6 +183,7 @@ export default {
                     .then((res) => {
                         const items = res.data.userByCognitoID.items[0]
                         this.id = ("id" in items) ? items.id : ""
+                        this._version = ("_version" in items) ? items._version : 0
                         this.overlay = false
                     })
             } catch (e) {
@@ -188,16 +191,19 @@ export default {
             }
         },
         async updateProfile () {
+            this._version++
             const updateUser = `
             mutation UpdateUser {
                 updateUser(input: {
                     id: "${this.id}",
                     name: "${this.username}",
-                    email: "${this.email}"
+                    email: "${this.email}",
+                    _version: ${this._version}
                 }) {
-                id
-                name
-                email
+                    id
+                    name
+                    email
+                    _version
                 }
             }
             `

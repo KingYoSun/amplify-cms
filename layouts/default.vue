@@ -99,6 +99,11 @@ export default {
                     title: 'サインイン',
                     to: '/signin',
                     status: ['loggedOut']
+                },
+                {
+                    title: '記事投稿',
+                    to: '/posts/editor/new',
+                    status: ['loggedIn']
                 }
             ],
             img: {
