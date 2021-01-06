@@ -12,10 +12,15 @@ type User @model @key(name: "byCognitoID", fields: ["cognitoID"], queryField: "u
   posts: [Post] @connection(keyName: "byUser", fields: ["id"])
 }
 
-type Post @model @key(name: "byUser", fields: ["userID"]) {
+type Post @model 
+@key(name: "byUser", fields: ["userID"])
+@key(name: "byCreatedAt", fields: ["div", "createdAt"], queryField: "postByCreatedAt")
+{
   id: ID!
+  div: String!
   title: String!
   contentUrl: String
+  tags: String
   userID: ID!
   createdAt: AWSDateTime
   updatedAt: AWSDateTime

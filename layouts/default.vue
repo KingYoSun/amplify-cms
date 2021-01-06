@@ -118,6 +118,7 @@ export default {
             if (info === 'signedIn') {
                 this.$router.push('/')
                 await this.getUserInfo()
+                this.showProfileIcon = true
             } else if (info === 'signedOut') {
                 this.$router.push('/')
                 this.logout()

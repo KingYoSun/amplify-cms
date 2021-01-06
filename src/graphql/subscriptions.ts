@@ -75,8 +75,10 @@ export const onCreatePost = /* GraphQL */ `
   subscription OnCreatePost {
     onCreatePost {
       id
+      div
       title
       contentUrl
+      tags
       userID
       createdAt
       updatedAt
@@ -105,8 +107,10 @@ export const onUpdatePost = /* GraphQL */ `
   subscription OnUpdatePost {
     onUpdatePost {
       id
+      div
       title
       contentUrl
+      tags
       userID
       createdAt
       updatedAt
@@ -135,8 +139,10 @@ export const onDeletePost = /* GraphQL */ `
   subscription OnDeletePost {
     onDeletePost {
       id
+      div
       title
       contentUrl
+      tags
       userID
       createdAt
       updatedAt

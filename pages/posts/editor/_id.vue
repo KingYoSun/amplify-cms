@@ -17,15 +17,8 @@
             <div class="my-1 mt-3" style="text-align: start;">
                 <span class="w-full">記事本文:</span>
             </div>
-            <div v-if="showEditor" class="w-full" style="text-align: start;">
-                <editor
-                :initialValue="editorText"
-                :options="editorOptions"
-                height="500px"
-                previewStyle="vertical"
-                ref="editor"
-                />
-                <viewer :value="editorText" />
+            <div v-if="showEditor" class="w-full rounded-md border">
+                <div id="editorjs" />
             </div>
             <div class="mt-3">
                 <button
@@ -42,18 +35,23 @@
 <script>
 import API, { graphqlOperation } from '@aws-amplify/api'
 import { nanoid } from 'nanoid'
-import { Editor, Viewer } from '@toast-ui/vue-editor'
 import Storage from '@aws-amplify/storage'
 import CustomOverlay from '~/components/overlay.vue'
 import CustomDialog from '~/components/dialog.vue'
 import * as Common from '~/assets/js/common.js'
-import { version } from 'codemirror'
+import EditorJS from '@editorjs/editorjs'
+import Header from '@editorjs/header'
+import Embed from '@editorjs/embed'
+import Paragraph from 'editorjs-paragraph-with-alignment'
+import Quote from '@editorjs/quote'
+import List from '@editorjs/list'
+import Table from '@editorjs/table'
+import RawTool from '@editorjs/raw'
+import AnyButton from 'editorjs-button'
 
 
 export default {
     components: {
-        Editor,
-        Viewer,
         CustomOverlay,
         CustomDialog
     },
@@ -73,33 +71,96 @@ export default {
                 identityID: ""
             },
             editorText: "",
-            editorOptions: {
-                hideModeSwitch: true,
-                toolbarItems: [
-                    'heading',
-                    'bold',
-                    'italic',
-                    'strike',
-                    'divider',
-                    'hr',
-                    'quote',
-                    'divider',
-                    'ul',
-                    'ol',
-                    'task',
-                    'indent',
-                    'outdent',
-                    'divider',
-                    'table',
-                    'link',
-                    'divider',
-                    'code',
-                    'codeblock'
-                ]
-            }
+            editor: null,
         }
     },
     async created () { 
+        //init EditorJS
+        this.editor = new EditorJS({
+            holder: 'editorjs',
+            tools: {
+                header: Header,
+                embed: Embed,
+                paragraph: {
+                    class: Paragraph,
+                    inlineToolbar: true
+                },
+                quote: Quote,
+                list: {
+                    class: List,
+                    inlineToolbar: true
+                },
+                table: {
+                    class: Table,
+                    inlineToolbar: true
+                },
+                raw: RawTool,
+                AnyButton: {
+                    class: AnyButton,
+                    inlineToolbar: true,
+                    config: {
+                        css: {
+                            "background-color": "#3B82F6"
+                        }
+                    }
+                }
+            },
+            i18n: {
+                messages: {
+                    ui: {
+                        "blockTunes": {
+                            "toggler": {
+                                "Click to tune": "調整する",
+                                "or drag to move": "ドラッグして動かす"
+                            },
+                        },
+                        "inlineToolbar": {
+                            "converter": {
+                                "Convert to": "変換する"
+                            }
+                        },
+                        "toolbar": {
+                            "toolbox": {
+                                "Add": "追加"
+                            }
+                        }
+                    },
+                    toolNames: {
+                        "Heading": "ヘッダー",
+                        "Quote": "引用",
+                        "Text": "テキスト",
+                        "List": "リスト",
+                        "Table": "表",
+                        "Raw HTML": "HTMLを直接入力",
+                        "Button": "ボタン"
+                    },
+                    tools: {
+                        "list": {
+                            "Ordered": "数値順",
+                            "Unordered": "点"
+                        },
+                        "AnyButton": {
+                            'Button Text': 'ボタンに表示するテキスト',
+                            'Link Url': 'ボタンの飛び先のURL',
+                            'Set': "設定する",
+                            'Default Button': "デフォルト",
+                        }
+                    },
+                    blockTunes: {
+                        "delete": {
+                            "Delete": "削除"
+                        },
+                        "moveUp": {
+                            "Move up": "上へ"
+                        },
+                        "moveDown": {
+                            "Move down": "下へ"
+                        }
+                    },
+                }
+            }
+        })
+        //init Page
         this.id = this.$route.params.id
         if ([null, undefined, "", "new"].indexOf(this.id) === -1) {
             await this.getPostAPI()
@@ -124,7 +185,7 @@ export default {
         async post () {
             try {
                 await this.setUser()
-                this.editorText = this.$refs.editor.invoke('getHtml')
+                this.editorText = ""
                 if (this.editorText === "") throw "ValidationError"
                 this.overlay = true
                 if (!this.newFlag) await this.S3Remove()

@@ -100,8 +100,10 @@ export const syncPosts = /* GraphQL */ `
     ) {
       items {
         id
+        div
         title
         contentUrl
+        tags
         userID
         createdAt
         updatedAt
@@ -118,8 +120,10 @@ export const getPost = /* GraphQL */ `
   query GetPost($id: ID!) {
     getPost(id: $id) {
       id
+      div
       title
       contentUrl
+      tags
       userID
       createdAt
       updatedAt
@@ -153,8 +157,10 @@ export const listPosts = /* GraphQL */ `
     listPosts(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        div
         title
         contentUrl
+        tags
         userID
         createdAt
         updatedAt
@@ -267,6 +273,41 @@ export const userByCognitoId = /* GraphQL */ `
         email
         description
         iconUrl
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;
+export const postByCreatedAt = /* GraphQL */ `
+  query PostByCreatedAt(
+    $div: String
+    $createdAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postByCreatedAt(
+      div: $div
+      createdAt: $createdAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        div
+        title
+        contentUrl
+        tags
+        userID
         createdAt
         updatedAt
         _version
