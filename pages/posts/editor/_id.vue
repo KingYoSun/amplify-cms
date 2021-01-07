@@ -48,7 +48,9 @@ import List from '@editorjs/list'
 import Table from '@editorjs/table'
 import RawTool from '@editorjs/raw'
 import AnyButton from 'editorjs-button'
-
+import Delimiter from '@editorjs/delimiter'
+import Marker from '@editorjs/marker'
+import Underline from '@editorjs/underline'
 
 export default {
     components: {
@@ -80,7 +82,10 @@ export default {
             holder: 'editorjs',
             tools: {
                 header: Header,
-                embed: Embed,
+                embed: {
+                    class: Embed,
+                    inlineToolbar: true
+                },
                 paragraph: {
                     class: Paragraph,
                     inlineToolbar: true
@@ -103,7 +108,13 @@ export default {
                             "background-color": "#3B82F6"
                         }
                     }
-                }
+                },
+                delimiter: Delimiter,
+                Marker: {
+                    class: Marker,
+                    shortcut: 'CMD+SHIFT+M'
+                },
+                underline: Underline
             },
             i18n: {
                 messages: {
@@ -116,7 +127,7 @@ export default {
                         },
                         "inlineToolbar": {
                             "converter": {
-                                "Convert to": "変換する"
+                                "Convert to": "変換する",
                             }
                         },
                         "toolbar": {
@@ -132,7 +143,13 @@ export default {
                         "List": "リスト",
                         "Table": "表",
                         "Raw HTML": "HTMLを直接入力",
-                        "Button": "ボタン"
+                        "Button": "ボタン",
+                        "Delimiter": "区切り",
+                        "Bold": "太字",
+                        "Italic": "斜体",
+                        "Link": "リンク",
+                        "Marker": "マーカー",
+                        "Underline": "下線"
                     },
                     tools: {
                         "list": {
