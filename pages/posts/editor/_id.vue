@@ -17,9 +17,7 @@
             <div class="my-1 mt-3" style="text-align: start;">
                 <span class="w-full">記事本文:</span>
             </div>
-            <div v-if="showEditor" class="w-full rounded-md border">
-                <div id="editorjs" />
-            </div>
+            <div id="editorjs" class="rounded-md border" />
             <div class="mt-3">
                 <button
                 class="uppercase px-8 py-2 bg-blue-600 text-white max-w-max shadow-sm hover:shadow-md mr-2 mt-2"
@@ -51,6 +49,10 @@ import AnyButton from 'editorjs-button'
 import Delimiter from '@editorjs/delimiter'
 import Marker from '@editorjs/marker'
 import Underline from '@editorjs/underline'
+import ImageTool from '@editorjs/image'
+
+let identityID = ""
+let postID = ""
 
 export default {
     components: {
@@ -63,7 +65,6 @@ export default {
             showDialog: false,
             dialogMessage: "",
             newFlag: false,
-            showEditor: false,
             id: "",
             title: "",
             contentUrl: "",
@@ -74,9 +75,24 @@ export default {
             },
             editorText: "",
             editor: null,
+            imageKeys: []
         }
     },
-    async created () { 
+    async created () {
+        //init Page
+        this.id = this.$route.params.id
+        if ([null, undefined, "", "new"].indexOf(this.id) === -1) {
+            await this.getPostAPI()
+            if (this.contentUrl !== "") {
+                await this.getPostS3()
+            }
+        } else {
+            this.id = nanoid()
+            this.newFlag = true
+        }
+        postID  =this.id
+        const currentCredentials = await this.$Amplify.Auth.currentCredentials()
+        identityID = currentCredentials.identityId
         //init EditorJS
         this.editor = new EditorJS({
             holder: 'editorjs',
@@ -114,7 +130,53 @@ export default {
                     class: Marker,
                     shortcut: 'CMD+SHIFT+M'
                 },
-                underline: Underline
+                underline: Underline,
+                image: {
+                    class: ImageTool,
+                    config: {
+                        uploader: {
+                            async uploadByFile (file) {
+                                const imgExtension = file.type.replace('image/', '')
+                                const nowUnix = Common.getNow()
+                                const key = 'post/' + postID + '/' + nowUnix + '.' + imgExtension
+                                let s3Key = ""
+                                let s3Url = ""
+                                await Storage.put(key, file, {
+                                    level: 'protected',
+                                    contentType: file.type
+                                })
+                                .then (result => {
+                                    s3Key = result.key
+                                    console.log('image uploaded')
+                                })
+                                await Storage.get(key, {
+                                    level: 'protected',
+                                    identityId: identityID,
+                                    expires: 86400
+                                })
+                                .then((res) => {
+                                    s3Url = res
+                                    console.log("image downloaded")
+                                })
+                                return {
+                                    success: 1,
+                                    file: {
+                                        url: s3Url,
+                                        key: s3Key
+                                    }
+                                }
+                            },
+                            uploadByUrl (url) {
+                                return {
+                                    success: 1,
+                                    file: {
+                                        url: url
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             },
             i18n: {
                 messages: {
@@ -149,7 +211,8 @@ export default {
                         "Italic": "斜体",
                         "Link": "リンク",
                         "Marker": "マーカー",
-                        "Underline": "下線"
+                        "Underline": "下線",
+                        "Image": "画像"
                     },
                     tools: {
                         "list": {
@@ -161,6 +224,11 @@ export default {
                             'Link Url': 'ボタンの飛び先のURL',
                             'Set': "設定する",
                             'Default Button': "デフォルト",
+                        },
+                        "image": {
+                            "With background": "背景化",
+                            "Stretch image": "ストレッチ",
+                            "With border": "境界線"
                         }
                     },
                     blockTunes: {
@@ -177,26 +245,11 @@ export default {
                 }
             }
         })
-        //init Page
-        this.id = this.$route.params.id
-        if ([null, undefined, "", "new"].indexOf(this.id) === -1) {
-            await this.getPostAPI()
-            if (this.contentUrl !== "") {
-                await this.getPostS3()
-            } else {
-                this.showEditor = true
-            }
-        } else {
-            this.id = nanoid()
-            this.newFlag = true
-            this.showEditor = true
-        }
     },
     methods: {
         async setUser() {
             if ([null, undefined, ""].indexOf(this.user.id) !== -1) {
                 this.user.id = this.$store.state.userID
-                console.log(this.$store.state.userID)
             }
         },
         async post () {
@@ -216,10 +269,9 @@ export default {
                 Common.failed(e, "バリデーションエラー", this.overlay)
                 this.overlay = false
             }
-            
         },
         async S3Upload () {
-            const key = 'post' + '/' + this.id + '.txt'
+            const key = 'post/' + this.id + '/' + this.id + '.txt'
             try {
                 await Storage.put(key, this.editorText, {
                     level: 'protected',

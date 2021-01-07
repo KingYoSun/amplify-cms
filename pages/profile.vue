@@ -183,7 +183,6 @@ export default {
         storeImgIcon (e) {
             const files = this.$refs.imgFile
             const fileImg = files.files[0]
-            console.log(fileImg)
             this.icon.imgPreview = null
             this.icon.imgFile = null
             this.icon.showPreviewImg = false
