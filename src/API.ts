@@ -97,6 +97,7 @@ export type CreatePostInput = {
   contentUrl?: string | null,
   tags?: string | null,
   userID: string,
+  draft?: boolean | null,
   createdAt?: string | null,
   updatedAt?: string | null,
   _version?: number | null,
@@ -108,6 +109,7 @@ export type ModelPostConditionInput = {
   contentUrl?: ModelStringInput | null,
   tags?: ModelStringInput | null,
   userID?: ModelIDInput | null,
+  draft?: ModelBooleanInput | null,
   createdAt?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
   and?: Array< ModelPostConditionInput | null > | null,
@@ -131,6 +133,13 @@ export type ModelIDInput = {
   size?: ModelSizeInput | null,
 };
 
+export type ModelBooleanInput = {
+  ne?: boolean | null,
+  eq?: boolean | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+};
+
 export type UpdatePostInput = {
   id: string,
   div?: string | null,
@@ -138,6 +147,7 @@ export type UpdatePostInput = {
   contentUrl?: string | null,
   tags?: string | null,
   userID?: string | null,
+  draft?: boolean | null,
   createdAt?: string | null,
   updatedAt?: string | null,
   _version?: number | null,
@@ -195,6 +205,7 @@ export type ModelPostFilterInput = {
   contentUrl?: ModelStringInput | null,
   tags?: ModelStringInput | null,
   userID?: ModelIDInput | null,
+  draft?: ModelBooleanInput | null,
   createdAt?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
   and?: Array< ModelPostFilterInput | null > | null,
@@ -327,6 +338,7 @@ export type CreatePostMutation = {
     contentUrl: string | null,
     tags: string | null,
     userID: string,
+    draft: boolean | null,
     createdAt: string | null,
     updatedAt: string | null,
     user:  {
@@ -365,6 +377,7 @@ export type UpdatePostMutation = {
     contentUrl: string | null,
     tags: string | null,
     userID: string,
+    draft: boolean | null,
     createdAt: string | null,
     updatedAt: string | null,
     user:  {
@@ -403,6 +416,7 @@ export type DeletePostMutation = {
     contentUrl: string | null,
     tags: string | null,
     userID: string,
+    draft: boolean | null,
     createdAt: string | null,
     updatedAt: string | null,
     user:  {
@@ -636,6 +650,7 @@ export type SyncPostsQuery = {
       contentUrl: string | null,
       tags: string | null,
       userID: string,
+      draft: boolean | null,
       createdAt: string | null,
       updatedAt: string | null,
       _version: number,
@@ -660,6 +675,7 @@ export type GetPostQuery = {
     contentUrl: string | null,
     tags: string | null,
     userID: string,
+    draft: boolean | null,
     createdAt: string | null,
     updatedAt: string | null,
     user:  {
@@ -701,6 +717,7 @@ export type ListPostsQuery = {
       contentUrl: string | null,
       tags: string | null,
       userID: string,
+      draft: boolean | null,
       createdAt: string | null,
       updatedAt: string | null,
       _version: number,
@@ -846,6 +863,7 @@ export type PostByCreatedAtQuery = {
       contentUrl: string | null,
       tags: string | null,
       userID: string,
+      draft: boolean | null,
       createdAt: string | null,
       updatedAt: string | null,
       _version: number,
@@ -938,6 +956,7 @@ export type OnCreatePostSubscription = {
     contentUrl: string | null,
     tags: string | null,
     userID: string,
+    draft: boolean | null,
     createdAt: string | null,
     updatedAt: string | null,
     user:  {
@@ -971,6 +990,7 @@ export type OnUpdatePostSubscription = {
     contentUrl: string | null,
     tags: string | null,
     userID: string,
+    draft: boolean | null,
     createdAt: string | null,
     updatedAt: string | null,
     user:  {
@@ -1004,6 +1024,7 @@ export type OnDeletePostSubscription = {
     contentUrl: string | null,
     tags: string | null,
     userID: string,
+    draft: boolean | null,
     createdAt: string | null,
     updatedAt: string | null,
     user:  {

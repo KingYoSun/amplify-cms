@@ -105,6 +105,7 @@ export const syncPosts = /* GraphQL */ `
         contentUrl
         tags
         userID
+        draft
         createdAt
         updatedAt
         _version
@@ -125,6 +126,7 @@ export const getPost = /* GraphQL */ `
       contentUrl
       tags
       userID
+      draft
       createdAt
       updatedAt
       user {
@@ -162,6 +164,7 @@ export const listPosts = /* GraphQL */ `
         contentUrl
         tags
         userID
+        draft
         createdAt
         updatedAt
         _version
@@ -308,6 +311,7 @@ export const postByCreatedAt = /* GraphQL */ `
         contentUrl
         tags
         userID
+        draft
         createdAt
         updatedAt
         _version

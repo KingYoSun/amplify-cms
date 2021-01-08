@@ -5,7 +5,7 @@
         :dialog="showDialog"
         :message="dialogMessage"
         :cancel="false"
-        @agree="showDialog = !showDialog"
+        @agree="refreshPage"
         />
         <div class="w-full mx-4">
             <div class="my-1">
@@ -68,195 +68,218 @@ export default {
             id: "",
             title: "",
             contentUrl: "",
-            _version: 0,
+            version: 0,
             user: {
                 id: "",
                 identityID: ""
             },
-            editorText: "",
+            editorJSON: "",
             editor: null,
+            tags: [],
+            draft: false,
             imageKeys: []
         }
     },
     async created () {
         //init Page
+        const currentCredentials = await this.$Amplify.Auth.currentCredentials()
+        this.user.identityID = currentCredentials.identityId
+        identityID = this.user.identityID
         this.id = this.$route.params.id
         if ([null, undefined, "", "new"].indexOf(this.id) === -1) {
             await this.getPostAPI()
+            postID  =this.id
             if (this.contentUrl !== "") {
                 await this.getPostS3()
             }
         } else {
             this.id = nanoid()
             this.newFlag = true
+            postID  =this.id
+            this.setEditor()
         }
-        postID  =this.id
-        const currentCredentials = await this.$Amplify.Auth.currentCredentials()
-        identityID = currentCredentials.identityId
-        //init EditorJS
-        this.editor = new EditorJS({
-            holder: 'editorjs',
-            tools: {
-                header: Header,
-                embed: {
-                    class: Embed,
-                    inlineToolbar: true
-                },
-                paragraph: {
-                    class: Paragraph,
-                    inlineToolbar: true
-                },
-                quote: Quote,
-                list: {
-                    class: List,
-                    inlineToolbar: true
-                },
-                table: {
-                    class: Table,
-                    inlineToolbar: true
-                },
-                raw: RawTool,
-                AnyButton: {
-                    class: AnyButton,
-                    inlineToolbar: true,
-                    config: {
-                        css: {
-                            "background-color": "#3B82F6"
-                        }
-                    }
-                },
-                delimiter: Delimiter,
-                Marker: {
-                    class: Marker,
-                    shortcut: 'CMD+SHIFT+M'
-                },
-                underline: Underline,
-                image: {
-                    class: ImageTool,
-                    config: {
-                        uploader: {
-                            async uploadByFile (file) {
-                                const imgExtension = file.type.replace('image/', '')
-                                const nowUnix = Common.getNow()
-                                const key = 'post/' + postID + '/' + nowUnix + '.' + imgExtension
-                                let s3Key = ""
-                                let s3Url = ""
-                                await Storage.put(key, file, {
-                                    level: 'protected',
-                                    contentType: file.type
-                                })
-                                .then (result => {
-                                    s3Key = result.key
-                                    console.log('image uploaded')
-                                })
-                                await Storage.get(key, {
-                                    level: 'protected',
-                                    identityId: identityID,
-                                    expires: 86400
-                                })
-                                .then((res) => {
-                                    s3Url = res
-                                    console.log("image downloaded")
-                                })
-                                return {
-                                    success: 1,
-                                    file: {
-                                        url: s3Url,
-                                        key: s3Key
-                                    }
-                                }
-                            },
-                            uploadByUrl (url) {
-                                return {
-                                    success: 1,
-                                    file: {
-                                        url: url
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            i18n: {
-                messages: {
-                    ui: {
-                        "blockTunes": {
-                            "toggler": {
-                                "Click to tune": "調整する",
-                                "or drag to move": "ドラッグして動かす"
-                            },
-                        },
-                        "inlineToolbar": {
-                            "converter": {
-                                "Convert to": "変換する",
-                            }
-                        },
-                        "toolbar": {
-                            "toolbox": {
-                                "Add": "追加"
-                            }
-                        }
-                    },
-                    toolNames: {
-                        "Heading": "ヘッダー",
-                        "Quote": "引用",
-                        "Text": "テキスト",
-                        "List": "リスト",
-                        "Table": "表",
-                        "Raw HTML": "HTMLを直接入力",
-                        "Button": "ボタン",
-                        "Delimiter": "区切り",
-                        "Bold": "太字",
-                        "Italic": "斜体",
-                        "Link": "リンク",
-                        "Marker": "マーカー",
-                        "Underline": "下線",
-                        "Image": "画像"
-                    },
-                    tools: {
-                        "list": {
-                            "Ordered": "数値順",
-                            "Unordered": "点"
-                        },
-                        "AnyButton": {
-                            'Button Text': 'ボタンに表示するテキスト',
-                            'Link Url': 'ボタンの飛び先のURL',
-                            'Set': "設定する",
-                            'Default Button': "デフォルト",
-                        },
-                        "image": {
-                            "With background": "背景化",
-                            "Stretch image": "ストレッチ",
-                            "With border": "境界線"
-                        }
-                    },
-                    blockTunes: {
-                        "delete": {
-                            "Delete": "削除"
-                        },
-                        "moveUp": {
-                            "Move up": "上へ"
-                        },
-                        "moveDown": {
-                            "Move down": "下へ"
-                        }
-                    },
-                }
-            }
-        })
     },
     methods: {
+        setEditor () {
+            this.editorJSON = this.editorJSON.replace(/\\/g, "")
+            this.editor = new EditorJS({
+                holder: 'editorjs',
+                data: ([null, undefined, ""].indexOf(this.editorJSON) !== -1) ? {} : JSON.parse(this.editorJSON),
+                tools: {
+                    header: Header,
+                    embed: {
+                        class: Embed,
+                        inlineToolbar: true
+                    },
+                    paragraph: {
+                        class: Paragraph,
+                        inlineToolbar: true
+                    },
+                    quote: Quote,
+                    list: {
+                        class: List,
+                        inlineToolbar: true
+                    },
+                    table: {
+                        class: Table,
+                        inlineToolbar: true
+                    },
+                    raw: RawTool,
+                    AnyButton: {
+                        class: AnyButton,
+                        inlineToolbar: true,
+                        config: {
+                            css: {
+                                "background-color": "#3B82F6"
+                            }
+                        }
+                    },
+                    delimiter: Delimiter,
+                    Marker: {
+                        class: Marker,
+                        shortcut: 'CMD+SHIFT+M'
+                    },
+                    underline: Underline,
+                    image: {
+                        class: ImageTool,
+                        config: {
+                            uploader: {
+                                async uploadByFile (file) {
+                                    const imgExtension = file.type.replace('image/', '')
+                                    const nowUnix = Common.getNow()
+                                    const key = 'post/' + postID + '/' + nowUnix + '.' + imgExtension
+                                    let s3Key = ""
+                                    let s3Url = ""
+                                    await Storage.put(key, file, {
+                                        level: 'protected',
+                                        contentType: file.type
+                                    })
+                                    .then (result => {
+                                        s3Key = result.key
+                                        console.log('image uploaded')
+                                    })
+                                    await Storage.get(key, {
+                                        level: 'protected',
+                                        identityId: identityID,
+                                        expires: 86400
+                                    })
+                                    .then((res) => {
+                                        s3Url = res
+                                        console.log("image downloaded")
+                                    })
+                                    return {
+                                        success: 1,
+                                        file: {
+                                            url: s3Url,
+                                            key: s3Key
+                                        }
+                                    }
+                                },
+                                uploadByUrl (url) {
+                                    return {
+                                        success: 1,
+                                        file: {
+                                            url: url
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                i18n: {
+                    messages: {
+                        ui: {
+                            "blockTunes": {
+                                "toggler": {
+                                    "Click to tune": "調整する",
+                                    "or drag to move": "ドラッグして動かす"
+                                },
+                            },
+                            "inlineToolbar": {
+                                "converter": {
+                                    "Convert to": "変換する",
+                                }
+                            },
+                            "toolbar": {
+                                "toolbox": {
+                                    "Add": "追加"
+                                }
+                            }
+                        },
+                        toolNames: {
+                            "Heading": "ヘッダー",
+                            "Quote": "引用",
+                            "Text": "テキスト",
+                            "List": "リスト",
+                            "Table": "表",
+                            "Raw HTML": "HTMLを直接入力",
+                            "Button": "ボタン",
+                            "Delimiter": "区切り",
+                            "Bold": "太字",
+                            "Italic": "斜体",
+                            "Link": "リンク",
+                            "Marker": "マーカー",
+                            "Underline": "下線",
+                            "Image": "画像"
+                        },
+                        tools: {
+                            "list": {
+                                "Ordered": "数値順",
+                                "Unordered": "点"
+                            },
+                            "AnyButton": {
+                                'Button Text': 'ボタンに表示するテキスト',
+                                'Link Url': 'ボタンの飛び先のURL',
+                                'Set': "設定する",
+                                'Default Button': "デフォルト",
+                            },
+                            "image": {
+                                "With background": "背景化",
+                                "Stretch image": "ストレッチ",
+                                "With border": "境界線"
+                            }
+                        },
+                        blockTunes: {
+                            "delete": {
+                                "Delete": "削除"
+                            },
+                            "moveUp": {
+                                "Move up": "上へ"
+                            },
+                            "moveDown": {
+                                "Move down": "下へ"
+                            }
+                        },
+                    }
+                }
+            })
+        },
+        refreshPage () {
+            if (this.newFlag) {
+                this.$router.push('/posts/editor/' + this.id)
+            }
+            if (process.browser) {
+                window.location.reload(true)
+            }
+        },
         async setUser() {
             if ([null, undefined, ""].indexOf(this.user.id) !== -1) {
                 this.user.id = this.$store.state.userID
             }
         },
+        store () {
+            this.draft = true
+            this.post()
+        },
         async post () {
             try {
                 await this.setUser()
-                this.editorText = ""
-                if (this.editorText === "") throw "ValidationError"
+                await this.editor.save().then((outputData) => {
+                    this.editorJSON = JSON.stringify(outputData).replace(/"/g, '\\"')
+                }).catch((err) => {
+                    throw "Saving Failed"
+                })
                 this.overlay = true
                 if (!this.newFlag) await this.S3Remove()
                 await this.S3Upload()
@@ -273,13 +296,13 @@ export default {
         async S3Upload () {
             const key = 'post/' + this.id + '/' + this.id + '.txt'
             try {
-                await Storage.put(key, this.editorText, {
+                await Storage.put(key, this.editorJSON, {
                     level: 'protected',
                     contentType: 'text/plain'
                 })
                 .then (result => {
                     this.contentUrl = result.key
-                    console.log('md file uploaded')
+                    console.log('json file uploaded')
                 })
                 .catch(e => {
                     Common.failed(e, "記事のアップロードに失敗しました", this.overlay)
@@ -314,6 +337,8 @@ export default {
                             title
                             contentUrl
                             userID
+                            tags
+                            draft
                             createdAt
                             updatedAt
                             _version
@@ -334,7 +359,9 @@ export default {
                         this.title = ("title" in items) ? items.title : ""
                         this.contentUrl = ("contentUrl" in items) ? items.contentUrl : ""
                         this.user = ("user" in items) ? items.user : {}
-                        this._version = ("_version" in items) ? items._version : 0
+                        this.tags = ("tags" in items) ? JSON.parse(items.tags) : []
+                        this.draft = ("draft" in items) ? items.draft : false
+                        this.version = ("_version" in items) ? items._version : 0
                     })
             } catch (e) {
                 console.log("記事の取得に失敗しました")
@@ -351,8 +378,8 @@ export default {
                 let reader = new FileReader()
                 reader.readAsText(data.Body, 'utf-8')
                 reader.onload = () => {
-                    this.editorText = reader.result
-                    this.showEditor = true
+                    this.editorJSON = reader.result
+                    this.setEditor()
                 }
             } catch (e) {
                 console.log("Getting Image Failed: " + e)
@@ -364,13 +391,18 @@ export default {
                     mutation CreatePost {
                         createPost(input: {
                             id: "${this.id}",
+                            div: "1",
                             title: "${this.title}",
                             contentUrl: "${this.contentUrl}",
+                            tags: "${JSON.stringify(this.tags).replace(/"/g, '\\"')}",
+                            draft: ${this.draft},
                             userID: "${this.user.id}"
                         }) {
                             id
                             title
                             contentUrl
+                            tags
+                            draft
                             userID
                         }
                     }
@@ -388,18 +420,22 @@ export default {
         },
         async updatePostAPI () {
             try {
-                this._version++
                 const updatePost = `
                     mutation UpdatePost {
                         updatePost(input: {
                             id: "${this.id}",
+                            div: "1",
                             title: "${this.title}",
                             contentUrl: "${this.contentUrl}",
-                            _version: ${this._version}
+                            tags: "${JSON.stringify(this.tags).replace(/"/g, '\\"')}",
+                            draft: ${this.draft},
+                            _version: ${this.version}
                         }) {
                             id
                             title
                             contentUrl
+                            tags
+                            draft
                             userID
                             createdAt
                             updatedAt

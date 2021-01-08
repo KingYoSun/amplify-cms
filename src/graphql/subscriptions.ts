@@ -80,6 +80,7 @@ export const onCreatePost = /* GraphQL */ `
       contentUrl
       tags
       userID
+      draft
       createdAt
       updatedAt
       user {
@@ -112,6 +113,7 @@ export const onUpdatePost = /* GraphQL */ `
       contentUrl
       tags
       userID
+      draft
       createdAt
       updatedAt
       user {
@@ -144,6 +146,7 @@ export const onDeletePost = /* GraphQL */ `
       contentUrl
       tags
       userID
+      draft
       createdAt
       updatedAt
       user {

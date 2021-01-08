@@ -92,6 +92,7 @@ export const createPost = /* GraphQL */ `
       contentUrl
       tags
       userID
+      draft
       createdAt
       updatedAt
       user {
@@ -127,6 +128,7 @@ export const updatePost = /* GraphQL */ `
       contentUrl
       tags
       userID
+      draft
       createdAt
       updatedAt
       user {
@@ -162,6 +164,7 @@ export const deletePost = /* GraphQL */ `
       contentUrl
       tags
       userID
+      draft
       createdAt
       updatedAt
       user {
