@@ -74,6 +74,7 @@ export default {
                 identityID: ""
             },
             editorJSON: "",
+            data: [],
             editor: null,
             tags: [],
             draft: false,
@@ -101,10 +102,9 @@ export default {
     },
     methods: {
         setEditor () {
-            this.editorJSON = this.editorJSON.replace(/\\/g, "")
             this.editor = new EditorJS({
                 holder: 'editorjs',
-                data: ([null, undefined, ""].indexOf(this.editorJSON) !== -1) ? {} : JSON.parse(this.editorJSON),
+                data: ([null, undefined, "", []].indexOf(this.data) !== -1) ? [] : this.data,
                 tools: {
                     header: Header,
                     embed: {
@@ -255,6 +255,26 @@ export default {
                 }
             })
         },
+        async setData (blocks) {
+            blocks = await Promise.all(
+                blocks.map(async obj => {
+                    if (obj.type === "image") {
+                        await Storage.get(obj.data.file.key, {
+                            level: 'protected',
+                            identityId: identityID,
+                            expires: 86400
+                        })
+                        .then((res) => {
+                            obj.data.file.url = res
+                            console.log("image downloaded")
+                        })
+                    }
+                    return obj
+                })
+            )
+            console.log(blocks)
+            return blocks
+        },
         refreshPage () {
             if (this.newFlag) {
                 this.$router.push('/posts/editor/' + this.id)
@@ -377,8 +397,10 @@ export default {
                 })
                 let reader = new FileReader()
                 reader.readAsText(data.Body, 'utf-8')
-                reader.onload = () => {
-                    this.editorJSON = reader.result
+                reader.onload = async () => {
+                    this.editorJSON = reader.result.replace(/\\/g, "")
+                    this.data = JSON.parse(this.editorJSON)
+                    this.data.blocks = await this.setData(this.data.blocks)
                     this.setEditor()
                 }
             } catch (e) {
