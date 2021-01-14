@@ -259,7 +259,7 @@ export default {
             if (this.newFlag) {
                 this.$router.push('/posts/editor/' + this.id)
             }
-            if (process.browser) {
+            if (!this.newFlag && process.browser) {
                 window.location.reload(true)
             }
         },
