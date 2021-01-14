@@ -31,6 +31,12 @@
                 >
                 記事を投稿（更新）する
                 </button>
+                <button
+                class="uppercase px-8 py-2 bg-gray-600 text-white max-w-max shadow-sm hover:shadow-md mr-2 mt-2"
+                @click="preview"
+                >
+                プレビュー
+                </button>
             </div>
         </div>
     </div>
@@ -278,7 +284,6 @@ export default {
                     return obj
                 })
             )
-            console.log(blocks)
             return blocks
         },
         refreshPage () {
@@ -288,6 +293,9 @@ export default {
             if (!this.newFlag && process.browser) {
                 window.location.reload(true)
             }
+        },
+        preview () {
+            this.$router.push('/posts/' + this.id)
         },
         async setUser() {
             if ([null, undefined, ""].indexOf(this.user.id) !== -1) {
@@ -404,7 +412,7 @@ export default {
                 let reader = new FileReader()
                 reader.readAsText(data.Body, 'utf-8')
                 reader.onload = async () => {
-                    this.editorJSON = reader.result.replace(/\\/g, "")
+                    this.editorJSON = reader.result.replace(/\\\"/g, '\"')
                     this.data = JSON.parse(this.editorJSON)
                     this.data.blocks = await this.setData(this.data.blocks)
                     this.setEditor()
