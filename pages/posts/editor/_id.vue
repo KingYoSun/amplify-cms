@@ -1,5 +1,5 @@
 <template>
-    <div class="container pt-24 pb-10">
+    <div class="container pb-10" style="padding-top: 8rem">
         <custom-overlay :overlay="overlay" />
         <custom-dialog
         :dialog="showDialog"
@@ -20,8 +20,14 @@
             <div id="editorjs" class="rounded-md border" />
             <div class="mt-3">
                 <button
+                class="uppercase px-8 py-2 bg-green-600 text-white max-w-max shadow-sm hover:shadow-md mr-2 mt-2"
+                @click="store(true)"
+                >
+                下書きを保存する
+                </button>
+                <button
                 class="uppercase px-8 py-2 bg-blue-600 text-white max-w-max shadow-sm hover:shadow-md mr-2 mt-2"
-                @click="post"
+                @click="store(false)"
                 >
                 記事を投稿（更新）する
                 </button>
@@ -288,8 +294,8 @@ export default {
                 this.user.id = this.$store.state.userID
             }
         },
-        store () {
-            this.draft = true
+        store (boolean) {
+            this.draft = boolean
             this.post()
         },
         async post () {
