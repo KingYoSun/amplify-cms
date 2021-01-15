@@ -875,6 +875,38 @@ export type PostByCreatedAtQuery = {
   } | null,
 };
 
+export type PostByUpdatedAtQueryVariables = {
+  div?: string | null,
+  updatedAt?: ModelStringKeyConditionInput | null,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelPostFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type PostByUpdatedAtQuery = {
+  postByUpdatedAt:  {
+    __typename: "ModelPostConnection",
+    items:  Array< {
+      __typename: "Post",
+      id: string,
+      div: string,
+      title: string,
+      contentUrl: string | null,
+      tags: string | null,
+      userID: string,
+      draft: boolean | null,
+      createdAt: string | null,
+      updatedAt: string | null,
+      _version: number,
+      _deleted: boolean | null,
+      _lastChangedAt: number,
+    } | null > | null,
+    nextToken: string | null,
+    startedAt: number | null,
+  } | null,
+};
+
 export type OnCreateUserSubscription = {
   onCreateUser:  {
     __typename: "User",

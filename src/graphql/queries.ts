@@ -323,3 +323,39 @@ export const postByCreatedAt = /* GraphQL */ `
     }
   }
 `;
+export const postByUpdatedAt = /* GraphQL */ `
+  query PostByUpdatedAt(
+    $div: String
+    $updatedAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelPostFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    postByUpdatedAt(
+      div: $div
+      updatedAt: $updatedAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        div
+        title
+        contentUrl
+        tags
+        userID
+        draft
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;

@@ -13,14 +13,7 @@
             <div class="flex flex-wrap my-2">
                 <span class="text-gray-600 mr-2">投稿者: </span>
                 <button class="flex flex-wrap">
-                    <img
-                    :src="iconImg.imgPreview"
-                    v-if="iconImg.showPreviewImg"
-                    alt="ユーザアイコン"
-                    @error="removeImg"
-                    class="object-contain"
-                    style="max-width: 30px;border-radius: 50%;margin: 0 auto !important;"
-                    />
+                    <user-icon :iconUrl="user.iconUrl" />
                     <span class="text-gray-600 hover:text-black ml-1">{{ user.name }}@{{ user.viewName }}</span>
                 </button>
             </div>
@@ -50,11 +43,13 @@ import CustomOverlay from '~/components/overlay.vue'
 import CustomDialog from '~/components/dialog.vue'
 import * as Common from '~/assets/js/common.js'
 import Parser from 'editorjs-parser'
+import UserIcon from '~/components/userIcon.vue'
 
 export default {
     components: {
         CustomOverlay,
-        CustomDialog
+        CustomDialog,
+        UserIcon
     },
     data () {
         return {
@@ -71,11 +66,6 @@ export default {
                 viewName: "",
                 iconUrl: "",
                 identityID: ""
-            },
-            iconImg: {
-                imgURL: null,
-                imgPreview: null,
-                showPreviewImg: false
             },
             tags: [],
             draft: false,
@@ -100,10 +90,6 @@ export default {
         }
     },
     methods: {
-        removeImg () {
-            this.$store.commit("removeImg")
-            this.iconImg.imgURL = null
-        },
         redirectHome () {
             this.$route.push('/')
         },
@@ -144,13 +130,6 @@ export default {
                         this.draft = ("draft" in items) ? items.draft : false
                         this.createdAt = ("createdAt" in items) ? items.createdAt : ""
                         this.updatedAt = ("updatedAt" in items) ? items.updatedAt : ""
-                        this.iconImg.imgURL = ("iconUrl" in items.user) ? items.user.iconUrl : null
-                        Common.setImgFile(this.iconImg)
-                            .then((res) => {
-                                if (res != null || res != undefined) {
-                                    this.iconImg = res
-                                }
-                            })
                     })
             } catch (e) {
                 console.log("記事の取得に失敗しました")

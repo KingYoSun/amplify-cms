@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container pb-10" style="padding-top: 10rem">
         <custom-overlay :overlay="overlay" />
         <custom-dialog
         :dialog="showDialog"
@@ -8,7 +8,34 @@
         @agree="showDialog = !showDialog"
         />
         <div>
-            
+            <div class="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-6">
+                <div
+                v-for="(post, index) in posts" :key="index"
+                class="max-w-sm rounded overflow-hidden shadow-xl"
+                >
+                    <div class="px-6 px-4">
+                        <div class="font-bold text-xl">{{ post.title }}</div>
+                        <p v-if="query.sort === 'createdAt'" class="text-gray-600 mb-2">投稿日時: {{ new Date(post.createdAt).toLocaleString() }}</p>
+                        <p v-if="query.sort === 'updatedAt'" class="text-gray-600 mb-2">更新日時: {{ new Date(post.updatedAt).toLocaleString() }}</p>
+                        <p class="text-gray-700 h-24">文頭</p>
+                    </div>
+                    <div class="px-6 px-4">
+                        <div class="flex flex-wrap my-2">
+                            <span class="text-gray-600 mr-2">投稿者: </span>
+                            <button class="flex flex-wrap">
+                                <user-icon :iconUrl="post.user.iconUrl" />
+                                <span class="text-gray-600 hover:text-black ml-1">{{ post.user.name }}@{{ post.user.viewName }}</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap my-2">
+                            <span class="font-bold text-gray-600 mr-2">タグ:</span>
+                            <div v-for="(tag, index) in JSON.parse(post.tags)" :key="index">
+                                <button class="mx-1 text-gray-600 hover:text-black">#{{ tag }}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -19,15 +46,297 @@ import Storage from '@aws-amplify/storage'
 import CustomOverlay from '~/components/overlay.vue'
 import CustomDialog from '~/components/dialog.vue'
 import * as Common from '~/assets/js/common.js'
+import UserIcon from '~/components/userIcon.vue'
  
  export default {
+     components: {
+        CustomOverlay,
+        CustomDialog,
+        UserIcon
+    },
      data () {
         return {
             overlay: false,
             showDialog: false,
             dialogMessage: "",
-            posts: []
+            posts: [],
+            nextToken: null,
+            nextTokens: [null],
+            page: 1,
+            totalPages: 1,
+            postCount: 0,
+            postsPerPage: 8,
+            query: {
+                title: "",
+                tags: "",
+                userID: "",
+                date: "",
+                sort: "createdAt",
+            },
+            queryUser: {
+                id: "",
+                identityID: "",
+                name: "",
+                viewName: "",
+                iconUrl: ""
+            },
+            sortTypes: [
+                {name: "作成日時順", value: "createdAt"},
+                {name: "更新日時順", value: "updatedAt"}
+            ],
+            sortName: "作成日時順",
+            showQueryUser: false,
+            loadflag: true
         }
+    },
+    asyncData (context) {
+        let query = {
+            title: "",
+            tag: "",
+            userID: "",
+            date: "",
+            sort: "createdAt"
+        }
+        const queryKey = Object.keys(context.query)
+        queryKey.map((key) => {
+            query[key] = context.query[key]
+        })
+        if([null, undefined, ""].indexOf(query.sort) !== -1) query.sort = "createdAt"
+        const sortTypes = [
+            {name: "作成日時順", value: "createdAt"},
+            {name: "更新日時順", value: "updatedAt"}
+        ]
+        const sortObj = sortTypes.find(obj => obj.value === query.sort)
+        const sortName = ([null, undefined, "", {}].indexOf(sortObj) === -1)? sortObj.name : "null"
+        const now = new Date()
+        const date = (query.date !== "")? new Date(Number(query.date.substring(0, 4)), Number(query.date.substring(5, 7))-1, Number(query.date.substring(8))) : new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        return { 
+            query: query,
+            sortName: sortName,
+            date: date,
+            nextTokens: [null]
+        }
+    },
+    watchQuery: ['title', 'tag', 'userID', 'date', 'sort'],
+    created () {
+        if (this.$store.state.page === undefined || this.$store.state.nextToken === undefined || this.$store.state.nextTokens === undefined) {
+            this.$store.commit("setupNextToken")
+            this.$store.commit("setupPage")
+        } else {
+            this.page = this.$store.state.page
+            this.nextTokens = this.$store.state.nextTokens
+            this.nextToken = this.nextTokens[this.page -1]
+            this.totalPages = this.nextTokens.length
+        }
+    },
+    mounted () {
+        this.startLoading()
+    },
+    computed: {
+        disableBackBtn () {
+            return ((this.page -1 < 1) ? true : false)
+        },
+        disableNextBtn () {
+            return ( ([null, "null", ""].indexOf(this.nextToken) !== -1 && this.postCount < this.postsPerPage) ? true : false )
+        }
+    },
+    watch: {
+        query: function(newVal) {
+            this.nextToken = null
+            this.nextTokens = [null]
+            this.$store.commit("setupNextToken")
+            this.startLoading()
+        },
+    },
+    methods: {
+        removeImg (obj) {
+            obj.imgURL = null
+        },
+        changeSort () {
+            this.$router.push({path: "/", query: this.query})
+        },
+        backBtn () {
+            this.page--
+            this.$store.commit("setPage", this.page)
+            this.postCount = 0
+            this.posts = []
+            this.$store.commit("setNextToken", this.nextToken)
+            this.nextToken = this.nextTokens[this.page-1]
+            this.getPosts()
+        },
+        nextBtn () {
+            if (this.page === this.totalPages) {
+                this.nextTokens.push(this.nextToken)
+                this.$store.commit("setNextTokens", this.nextTokens)
+                this.totalPages++
+            }
+            this.page++
+            this.$store.commit("setPage", this.page)
+            this.postCount = 0
+            this.posts = []
+            this.getPosts()
+        },
+        async startLoading () {
+            if (this.query.userID !== "") {
+                await this.getUser()
+            }
+            this.getPosts()
+        },
+        async getPostsCreatedAt (nextToken, filter) {
+            const postByCreatedAt = `
+                query PostByCreatedAt {
+                    postByCreatedAt (
+                        div: "1"
+                        createdAt: {le: "${new Date().toISOString()}"}
+                        sortDirection: DESC
+                        ${filter}
+                        limit: ${this.postsPerPage - this.postCount}
+                        nextToken: ${nextToken}
+                    ) {
+                    items {
+                        id
+                        div
+                        title
+                        tags
+                        draft
+                        createdAt
+                        updatedAt
+                        userID
+                        user {
+                            id
+                            identityID
+                            name
+                            viewName
+                            iconUrl
+                        }
+                        _version
+                        _deleted
+                    }
+                    nextToken
+                    }
+                }
+            `
+            try {
+                await API.graphql(graphqlOperation(postByCreatedAt))
+                    .then((res) => {
+                        const items = res.data.postByCreatedAt.items.filter(obj => !obj._deleted)
+                        this.$store.commit("setNextToken", this.nextToken)
+                        this.nextToken = res.data.postByCreatedAt.nextToken
+                        this.posts = items
+                        this.postCount += items.length
+                        if (this.postCount >= this.postsPerPage || this.nextToken === null) {
+                            this.loadflag = false
+                        }
+                    })
+            } catch (e) {
+                Common.failed(e, "投稿の読み込みに失敗しました", this.overlay)
+                this.overlay = false
+            }
+        },
+        async getPostsUpdatedAt (nextToken, filter) {
+            const postByUpdatedAt = `
+                query PostByUpdatedAt {
+                    postByUpdatedAt (
+                        div: "1"
+                        updatedAt: {le: "${new Date().toISOString()}"}
+                        sortDirection: DESC
+                        ${filter}
+                        limit: ${this.postsPerPage - this.postCount}
+                        nextToken: ${nextToken}
+                    ) {
+                    items {
+                        id
+                        div
+                        title
+                        tags
+                        draft
+                        createdAt
+                        updatedAt
+                        userID
+                        user {
+                            id
+                            identityID
+                            name
+                            viewName
+                            iconUrl
+                        }
+                        _version
+                        _deleted
+                    }
+                    nextToken
+                    }
+                }
+            `
+            try {
+                await API.graphql(graphqlOperation(postByUpdatedAt))
+                    .then((res) => {
+                        const items = res.data.postByUpdatedAt.items.filter(obj => !obj._deleted)
+                        this.$store.commit("setNextToken", this.nextToken)
+                        this.nextToken = res.data.postByUpdatedAt.nextToken
+                        this.posts = items
+                        this.postCount += items.length
+                        if (this.postCount >= this.postsPerPage || this.nextToken === null) {
+                            this.loadflag = false
+                        }
+                    })
+            } catch (e) {
+                Common.failed(e, "投稿の読み込みに失敗しました", this.overlay)
+                this.overlay = false
+            }
+        },
+        async getPosts () {
+            this.overlay = true
+            let nextToken = null
+            this.loadflag = true
+            do {
+                if (this.nextToken) {
+                    nextToken = `"${this.nextToken}"`
+                }
+                const filterTitle = (this.query.title !== "")? `{title: {contains: "${this.query.title}"}},`: ''
+                const filterTagTitle = (this.query.title !== "")? `{tag: {contains: "${this.query.title}"}},`: ''
+                const filterTag = (this.query.tag !== "")? `{tag: {contains: "${this.query.tag}"}},`: ''
+                const filterOR = ( filterTitle !== '' || filterTagTitle !== '' || filterTag !== '')? 'or: [' + filterTitle + filterTagTitle + filterTag + '],' : ''
+                
+                const filterUserID = (this.query.userID !== "")? `{userID: {eq: "${this.query.userID}"}},` : ''
+                const filterAnd = ( filterUserID !== '')? 'and: [' + filterUserID + ']' : ''
+                
+                const filter = ( filterOR !== '' || filterAnd !== '')? 'filter: {' + filterOR + filterAnd + '}' : ''
+                if (this.query.sort === "createdAt") {
+                    await this.getPostsCreatedAt(nextToken, filter)
+                } else if (this.query.sort === "updatedAt") {
+                    await this.getPostsUpdatedAt(nextToken, filter)
+                } else {
+                    this.loadflag = false
+                }
+            } while (this.loadflag)
+            this.overlay = false
+            console.log("Loading done") 
+        },
+        async getUser() {
+            this.overlay = true
+            const getUser = `
+                query GetUser {
+                    getUser(id: "${this.query.userID}") {
+                        id
+                        identityID
+                        name
+                        viewName
+                        iconUrl
+                    }
+                }
+            `
+            try {
+                await API.graphql(graphqlOperation(getUser))
+                    .then((res) => {
+                        this.queryUser = res.data.getUser
+                        this.overlay = false
+                        this.showQueryUser = true
+                    })
+            } catch (e) {
+                Common.failed(e, "ユーザーの読み込みに失敗しました", this.overlay)
+                this.overlay = false
+            }
+        },
     }
  }
 </script>
