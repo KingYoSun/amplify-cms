@@ -11,7 +11,7 @@
             <div class="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-6">
                 <div
                 v-for="(post, index) in posts" :key="index"
-                class="max-w-sm rounded overflow-hidden shadow-xl"
+                class="max-w-sm rounded overflow-hidden shadow-xl border-2 border-gray-300"
                 >
                     <div class="px-6 px-4">
                         <div class="font-bold text-xl">{{ post.title }}</div>
