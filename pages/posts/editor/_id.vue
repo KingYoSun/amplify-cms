@@ -55,7 +55,7 @@
                 class="uppercase px-8 py-2 bg-gray-600 text-white max-w-max shadow-sm hover:shadow-md mr-2 mt-2"
                 @click="preview"
                 >
-                プレビュー
+                記事のページに移動
                 </button>
             </div>
         </div>
