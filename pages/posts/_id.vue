@@ -8,6 +8,28 @@
         @agree="redirectHome"
         />
         <div class="mx-4 max-w-screen-md">
+            <p class="text-3xl font-black">{{ title }}</p>
+            <p class="text-gray-600">投稿日時: {{ new Date(createdAt).toLocaleString() }}<span class="mx-2" />更新日時: {{ new Date(updatedAt).toLocaleString() }}</p>
+            <div class="flex flex-wrap my-2">
+                <span class="text-gray-600 mr-2">投稿者: </span>
+                <button class="flex flex-wrap">
+                    <img
+                    :src="iconImg.imgPreview"
+                    v-if="iconImg.showPreviewImg"
+                    alt="ユーザアイコン"
+                    @error="removeImg"
+                    class="object-contain"
+                    style="max-width: 30px;border-radius: 50%;margin: 0 auto !important;"
+                    />
+                    <span class="text-gray-600 hover:text-black ml-1">{{ user.name }}@{{ user.viewName }}</span>
+                </button>
+            </div>
+            <div class="flex flex-wrap my-2">
+                <span class="font-bold text-gray-600 mr-2">タグ:</span>
+                <div v-for="(tag, index) in tags" :key="index">
+                    <button class="mx-2 text-gray-600 hover:text-black">#{{ tag }}</button>
+                </div>
+            </div>
             <div v-if="showHtml" v-html="parsedHtml" />
             <div class="mt-3">
                 <button
@@ -45,10 +67,20 @@ export default {
             contentUrl: "",
             user: {
                 id: "",
+                name: "",
+                viewName: "",
+                iconUrl: "",
                 identityID: ""
+            },
+            iconImg: {
+                imgURL: null,
+                imgPreview: null,
+                showPreviewImg: false
             },
             tags: [],
             draft: false,
+            createdAt: "",
+            updatedAt: "",
             parser: null,
             parsedHtml: "",
             showHtml: false
@@ -68,6 +100,10 @@ export default {
         }
     },
     methods: {
+        removeImg () {
+            this.$store.commit("removeImg")
+            this.iconImg.imgURL = null
+        },
         redirectHome () {
             this.$route.push('/')
         },
@@ -86,6 +122,9 @@ export default {
                             updatedAt
                             user {
                                 id
+                                name
+                                viewName
+                                iconUrl
                                 identityID
                             }
                         }
@@ -103,6 +142,15 @@ export default {
                         this.user = ("user" in items) ? items.user : {}
                         this.tags = ("tags" in items) ? JSON.parse(items.tags) : []
                         this.draft = ("draft" in items) ? items.draft : false
+                        this.createdAt = ("createdAt" in items) ? items.createdAt : ""
+                        this.updatedAt = ("updatedAt" in items) ? items.updatedAt : ""
+                        this.iconImg.imgURL = ("iconUrl" in items.user) ? items.user.iconUrl : null
+                        Common.setImgFile(this.iconImg)
+                            .then((res) => {
+                                if (res != null || res != undefined) {
+                                    this.iconImg = res
+                                }
+                            })
                     })
             } catch (e) {
                 console.log("記事の取得に失敗しました")

@@ -14,8 +14,28 @@
                     <input v-model="title" type="text" class="form-input w-full mt-1" placeholder="記事タイトル">
                 </label>
             </div>
-            <div class="my-1 mt-3" style="text-align: start;">
-                <span class="w-full">記事本文:</span>
+            <div class="my-1">
+                <label class="flex flex-wrap items-center mt-3">
+                    <span class="text-gray-700">タグ:</span>
+                    <input v-model="tag" type="text" class="form-input w-60 mx-2" placeholder="タグ">
+                    <button
+                    class="uppercase px-4 py-2 bg-green-600 text-white max-w-max shadow-sm hover:shadow-md"
+                    @click="addTags"
+                    >
+                    タグ追加
+                    </button>
+                </label>
+            </div>
+            <div class="flex flex-wrap my-2">
+                <div v-for="(tag, index) in tags" :key="index">
+                    <div class="flex mx-2">
+                        <trash @trash="delTags(tag)" />
+                        <h4>#{{ tag }}{{ (index !== tags.length -1)? ',' : '' }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="my-1 mt-5" style="text-align: start;">
+                <span class="w-full">記事本文: {{ (draft)? "下書き" : "投稿済み" }}</span>
             </div>
             <div id="editorjs" class="rounded-md border" />
             <div class="mt-3">
@@ -49,6 +69,7 @@ import Storage from '@aws-amplify/storage'
 import CustomOverlay from '~/components/overlay.vue'
 import CustomDialog from '~/components/dialog.vue'
 import * as Common from '~/assets/js/common.js'
+import Trash from '~/components/icons/trash.vue'
 import EditorJS from '@editorjs/editorjs'
 import Header from '@editorjs/header'
 import Embed from '@editorjs/embed'
@@ -69,7 +90,8 @@ let postID = ""
 export default {
     components: {
         CustomOverlay,
-        CustomDialog
+        CustomDialog,
+        Trash
     },
     data () {
         return {
@@ -89,6 +111,7 @@ export default {
             data: [],
             editor: null,
             tags: [],
+            tag: "",
             draft: false,
             imageKeys: []
         }
@@ -285,6 +308,14 @@ export default {
                 })
             )
             return blocks
+        },
+        addTags () {
+            this.tags.push(this.tag)
+            this.tags = [...new Set(this.tags)]
+            this.tag = ""
+        },
+        delTags (deltag) {
+            this.tags = this.tags.filter(tag => tag !== deltag)
         },
         refreshPage () {
             if (this.newFlag) {
