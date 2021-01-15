@@ -8,6 +8,7 @@
         @agree="showDialog = !showDialog"
         />
         <div>
+            <search-form class="my-4" />
             <div class="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-6">
                 <div
                 v-for="(post, index) in posts" :key="index"
@@ -47,12 +48,14 @@ import CustomOverlay from '~/components/overlay.vue'
 import CustomDialog from '~/components/dialog.vue'
 import * as Common from '~/assets/js/common.js'
 import UserIcon from '~/components/userIcon.vue'
+import SearchForm from '~/components/searchForm.vue'
  
  export default {
      components: {
         CustomOverlay,
         CustomDialog,
-        UserIcon
+        UserIcon,
+        SearchForm
     },
      data () {
         return {
@@ -61,18 +64,10 @@ import UserIcon from '~/components/userIcon.vue'
             dialogMessage: "",
             posts: [],
             nextToken: null,
-            nextTokens: [null],
             page: 1,
             totalPages: 1,
             postCount: 0,
             postsPerPage: 8,
-            query: {
-                title: "",
-                tags: "",
-                userID: "",
-                date: "",
-                sort: "createdAt",
-            },
             queryUser: {
                 id: "",
                 identityID: "",
@@ -84,7 +79,6 @@ import UserIcon from '~/components/userIcon.vue'
                 {name: "作成日時順", value: "createdAt"},
                 {name: "更新日時順", value: "updatedAt"}
             ],
-            sortName: "作成日時順",
             showQueryUser: false,
             loadflag: true
         }
@@ -183,11 +177,14 @@ import UserIcon from '~/components/userIcon.vue'
             this.getPosts()
         },
         async getPostsCreatedAt (nextToken, filter) {
+            const date = this.date
+            this.date = new Date(date.setDate(date.getDate() + 1))
+            const createdAtLe = ([null, undefined, ""].indexOf(this.date) === -1)? this.date.toISOString() : new Date().toISOString()
             const postByCreatedAt = `
                 query PostByCreatedAt {
                     postByCreatedAt (
                         div: "1"
-                        createdAt: {le: "${new Date().toISOString()}"}
+                        createdAt: {le: "${createdAtLe}"}
                         sortDirection: DESC
                         ${filter}
                         limit: ${this.postsPerPage - this.postCount}
@@ -293,8 +290,8 @@ import UserIcon from '~/components/userIcon.vue'
                     nextToken = `"${this.nextToken}"`
                 }
                 const filterTitle = (this.query.title !== "")? `{title: {contains: "${this.query.title}"}},`: ''
-                const filterTagTitle = (this.query.title !== "")? `{tag: {contains: "${this.query.title}"}},`: ''
-                const filterTag = (this.query.tag !== "")? `{tag: {contains: "${this.query.tag}"}},`: ''
+                const filterTagTitle = (this.query.title !== "")? `{tags: {contains: "${this.query.title}"}},`: ''
+                const filterTag = (this.query.tag !== "")? `{tags: {contains: "${this.query.tag}"}},`: ''
                 const filterOR = ( filterTitle !== '' || filterTagTitle !== '' || filterTag !== '')? 'or: [' + filterTitle + filterTagTitle + filterTag + '],' : ''
                 
                 const filterUserID = (this.query.userID !== "")? `{userID: {eq: "${this.query.userID}"}},` : ''
@@ -352,7 +349,6 @@ import UserIcon from '~/components/userIcon.vue'
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 
 .title {
