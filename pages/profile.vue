@@ -1,5 +1,5 @@
 <template>
-    <div class="container pt-24 pb-10">
+    <div class="container pb-10" style="padding-top: 9em;">
         <custom-overlay :overlay="overlay" />
         <custom-dialog
         :dialog="showDialog"
@@ -158,7 +158,6 @@ export default {
                             email
                             description
                             iconUrl
-                            _version
                         }
                     }
                 }
@@ -170,7 +169,6 @@ export default {
                         this.id = ("id" in items) ? items.id : ""
                         this.viewName = ("viewName" in items) ? items.viewName : ""
                         this.description = ("description" in items) ? items.description.replace(/\\n/g, '\n') : ""
-                        this._version = ("_version" in items) ? items._version : 0
                         this.icon.imgURL = ("iconUrl" in items && items.iconUrl !== "") ? items.iconUrl : null
                         Common.setImgFile(this.icon)
                         this.overlay = false
@@ -214,7 +212,6 @@ export default {
         },
         async updateProfile () {
             this.overlay = true
-            this._version++
             const date = new Date()
             const nowUnix = Math.floor(date.getTime() / 1000)
             const updateUser = `
@@ -226,8 +223,7 @@ export default {
                     email: "${this.currentUserInfo.attributes.email}",
                     description: "${this.description.replace(/\n/g,'\\n')}",
                     iconUrl: "${this.icon.imgURL}",
-                    identityID: "${this.currentCredentials.identityId}",
-                    _version: ${this._version}
+                    identityID: "${this.currentCredentials.identityId}"
                 }) {
                     id
                     name
@@ -236,7 +232,6 @@ export default {
                     description
                     iconUrl
                     identityID
-                    _version
                 }
             }
             `
