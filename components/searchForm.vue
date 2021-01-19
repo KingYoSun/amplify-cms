@@ -85,7 +85,6 @@ export default {
             return moment(date).format('YYYY-MM-DD')
         },
         search () {
-            if (this.title === "") return false
             const tag = (this.$route.query.tag !== undefined)? this.$route.query.tag : ""
             const userID =(this.$route.query.userID !== undefined)? this.$route.query.userID : ""
             const sort = (this.$route.query.sort !== undefined)? this.$route.query.sort : ""
