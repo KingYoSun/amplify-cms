@@ -16,9 +16,12 @@
             </button>
 
             <div class="flex items-center flex-no-shrink text-white mr-6">
-                <a class="text-white no-underline hover:text-white hover:no-underline" href="#">
+                <nuxt-link
+                to="/"
+                class="text-white no-underline hover:text-white hover:no-underline"
+                >
                     <span class="text-2xl pl-2">Amplify-CMS</span>
-                </a>
+                </nuxt-link>
             </div>
 
             <div class="block lg:hidden">
@@ -132,11 +135,6 @@ export default {
             isOpen: false,
             admin: false,
             links: [
-                {
-                    title: 'ホーム',
-                    to: '/',
-                    status: ['loggedIn', 'loggedOut']
-                },
                 {
                     title: 'サインイン',
                     to: '/signin',
