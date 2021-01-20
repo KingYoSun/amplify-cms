@@ -1,5 +1,5 @@
 <template>
-    <div class="container pb-10" style="padding-top: 9em;">
+    <div class="container pb-10" style="padding-top: 8em;">
         <custom-overlay :overlay="overlay" />
         <custom-dialog
         :dialog="showDialog"

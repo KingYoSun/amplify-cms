@@ -7,17 +7,24 @@ export default async ({ params, redirect }) => {
       redirect('/signin')
     }
 
-    const getAdmin = `
-        query GetAdmin {
-            getAdmin(id: "${userInfo.attributes.sub}") {
-                id
+    const adminByCognitoId = `
+        query AdminByCognitoId {
+            adminByCognitoID(
+                userID: "${userInfo.attributes.sub}",
+                limit: 1
+            ) {
+                items {
+                    id
+                    userID
+                }
+            }
         }
     `
     try {
-        await API.graphql(graphqlOperation(getAdmin))
+        await API.graphql(graphqlOperation(adminByCognitoId))
             .then((response) => {
-                const item = response.data.getAdmin
-                if ([null, undefined, ""].indexOf(item) !== -1) {
+                const item = response.data.adminByCognitoID.items
+                if ([null, undefined, ""].indexOf(item) !== -1 || item.length == 0) {
                     alert('無効なログイン情報です')
                     redirect('/')
                 }

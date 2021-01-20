@@ -359,3 +359,32 @@ export const postByUpdatedAt = /* GraphQL */ `
     }
   }
 `;
+export const adminByCognitoId = /* GraphQL */ `
+  query AdminByCognitoId(
+    $userID: ID
+    $sortDirection: ModelSortDirection
+    $filter: ModelAdminFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    adminByCognitoID(
+      userID: $userID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        userID
+        _version
+        _deleted
+        _lastChangedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;

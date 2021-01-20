@@ -29,7 +29,7 @@ type Post @model
   user: User @connection(fields: ["userID"])
 }
 
-type Admin @model @key(name: "byUser", fields: ["userID"]){
+type Admin @model @key(name: "byUser", fields: ["userID"], queryField: "adminByCognitoID"){
   id: ID!
   userID: ID!
   user: User @connection(fields: ["userID"])

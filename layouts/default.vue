@@ -1,6 +1,20 @@
 <template>
     <div>
         <nav class="flex fiexed items-center justify-between flex-wrap bg-gray-700 px-6 h-16 fixed w-full z-10 pin-t">
+            <button v-if="admin" class="mr-2" aria-label="Open Menu" @click="drawer">
+                <svg
+                fill="none"
+                stroke="#ffffff"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                class="w-8 h-8"
+                >
+                <path d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+
             <div class="flex items-center flex-no-shrink text-white mr-6">
                 <a class="text-white no-underline hover:text-white hover:no-underline" href="#">
                     <span class="text-2xl pl-2">Amplify-CMS</span>
@@ -44,6 +58,28 @@
                     </li>
                 </ul>
             </div>
+            <admin-sidebar v-if="admin" :isOpen="isOpen" @onClickLink="drawer" />
+            <transition
+            enter-class="opacity-0"
+            enter-active-class="ease-out transition-medium"
+            enter-to-class="opacity-100"
+            leave-class="opacity-100"
+            leave-active-class="ease-out transition-medium"
+            leave-to-class="opacity-0"
+            >
+                <div
+                @keydown.esc="isOpen = false"
+                v-show="isOpen"
+                class="z-10 fixed inset-0 transition-opacity"
+                >
+                    <div
+                    @click="isOpen = false"
+                    class="absolute inset-0 bg-black opacity-50"
+                    tabindex="0"
+                    >
+                    </div>
+                </div>
+            </transition>
         </nav>
         <div v-if="showSideBar" class="sidebar bg-gray-700 w-40 shadow-xl justify-items-end z-20">
             <div class="text-white" v-if="showProfileIcon">
@@ -81,14 +117,20 @@ import API, { graphqlOperation } from '@aws-amplify/api'
 import { AmplifyEventBus } from 'aws-amplify-vue'
 import * as Common from '~/assets/js/common.js'
 import { nanoid } from 'nanoid'
+import AdminSidebar from '~/components/adminSidebar.vue'
 
 export default {
+    components: {
+        AdminSidebar
+    },
     data () {
         return {
             currentUserInfo: null,
             showSideBar: false,
             isLoggedIn: false,
             showProfileIcon: false,
+            isOpen: false,
+            admin: false,
             links: [
                 {
                     title: 'ホーム',
@@ -99,11 +141,6 @@ export default {
                     title: 'サインイン',
                     to: '/signin',
                     status: ['loggedOut']
-                },
-                {
-                    title: '記事投稿',
-                    to: '/posts/editor/new',
-                    status: ['loggedIn']
                 }
             ],
             img: {
@@ -125,7 +162,10 @@ export default {
             }
         })
         await this.getUserInfo()
-        if (this.isLoggedIn) this.showProfileIcon = true
+        if (this.isLoggedIn) {
+            this.getAdmin()
+            this.showProfileIcon = true
+        }
     },
     computed: {
         filteredItems () {
@@ -140,6 +180,9 @@ export default {
         },
     },
     methods: {
+        drawer () {
+            this.isOpen = !this.isOpen
+        },
         async getUserInfo () {
             this.currentUserInfo = this.$store.state.currentUserInfo || await this.$Amplify.Auth.currentUserInfo()
             if (this.currentUserInfo) {
@@ -154,6 +197,31 @@ export default {
             this.$store.commit('logout')
             this.isLoggedIn = false
             this.$store.commit('removeImg')
+        },
+        async getAdmin () {
+            const adminByCognitoId = `
+                query AdminByCognitoId {
+                    adminByCognitoID(
+                        userID: "${this.currentUserInfo.attributes.sub}",
+                        limit: 1
+                    ) {
+                        items {
+                            id
+                            userID
+                        }
+                    }
+                }
+            `
+            try {
+                await API.graphql(graphqlOperation(adminByCognitoId))
+                    .then((response) => {
+                        const item = response.data.adminByCognitoID.items
+                        if ([null, undefined, ""].indexOf(item) === -1 && item.length > 0) this.admin = true
+                    })
+            } catch (e) {
+                console.log('管理者情報の取得に失敗しました')
+                console.log(e)
+            }
         },
         async getProfile () {
             if (!this.currentUserInfo) {

@@ -907,6 +907,32 @@ export type PostByUpdatedAtQuery = {
   } | null,
 };
 
+export type AdminByCognitoIdQueryVariables = {
+  userID?: string | null,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelAdminFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type AdminByCognitoIdQuery = {
+  adminByCognitoID:  {
+    __typename: "ModelAdminConnection",
+    items:  Array< {
+      __typename: "Admin",
+      id: string,
+      userID: string,
+      _version: number,
+      _deleted: boolean | null,
+      _lastChangedAt: number,
+      createdAt: string,
+      updatedAt: string,
+    } | null > | null,
+    nextToken: string | null,
+    startedAt: number | null,
+  } | null,
+};
+
 export type OnCreateUserSubscription = {
   onCreateUser:  {
     __typename: "User",

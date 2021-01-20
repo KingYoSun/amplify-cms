@@ -257,7 +257,8 @@ export const schema = {
                         "name": "byUser",
                         "fields": [
                             "userID"
-                        ]
+                        ],
+                        "queryField": "adminByCognitoID"
                     }
                 }
             ]
@@ -265,5 +266,5 @@ export const schema = {
     },
     "enums": {},
     "nonModels": {},
-    "version": "af055ab4cdb9f18f19361307a990037d"
+    "version": "a7a09d118337b5947656a8cdecb6ac2c"
 };

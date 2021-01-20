@@ -135,6 +135,7 @@ export default {
             this.setEditor()
         }
     },
+    middleware: "admin",
     methods: {
         setEditor () {
             this.editor = new EditorJS({
