@@ -1,6 +1,6 @@
 <template>
     <div>
-        <nav class="flex items-center justify-between flex-wrap bg-gray-700 p-6 fixed w-full z-10 pin-t">
+        <nav class="flex fiexed items-center justify-between flex-wrap bg-gray-700 px-6 h-16 fixed w-full z-10 pin-t">
             <div class="flex items-center flex-no-shrink text-white mr-6">
                 <a class="text-white no-underline hover:text-white hover:no-underline" href="#">
                     <span class="text-2xl pl-2">Amplify-CMS</span>
@@ -18,7 +18,7 @@
             </div>
 
             <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block pt-6 lg:pt-0" id="nav-content">
-                <ul class="list-reset lg:flex justify-end flex-1 items-center">
+                <ul class="list-reset lg:flex justify-end flex-1 items-center h-16">
                     <li v-for="(link, index) in filteredItems" :key="index" class="mr-3">
                         <nuxt-link
                         class="inline-block font-bold text-gray-500 no-underline hover:text-gray-200 hover:text-underline py-2 px-4"
@@ -27,20 +27,20 @@
                         </nuxt-link>
                     </li>
                     <li class="text-white" v-if="showProfileIcon">
-                        <nuxt-link to="/profile">
+                        <nuxt-link class="flex flex-wrap" to="/profile">
                             <img
                             :src="$store.state.imgPreview"
                             v-if="$store.state.showPreviewImg"
                             alt="ユーザアイコン"
                             @error="removeImg"
                             class="object-contain"
-                            style="max-width: 50px;border-radius: 50%;margin: 0 auto !important;"
+                            style="max-width: 40px;border-radius: 50%;"
                             />
                             <span class="mx-2">{{ $store.state.currentUserInfo.username }}</span>
                         </nuxt-link>
                     </li>
                     <li v-if="isLoggedIn">
-                        <amplify-sign-out class="mx-auto"/>
+                        <amplify-sign-out class="pt-2 mx-auto"/>
                     </li>
                 </ul>
             </div>
