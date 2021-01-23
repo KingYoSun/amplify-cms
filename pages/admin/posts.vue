@@ -38,6 +38,12 @@
                     </div>
                     <div class="flex flex-wrap">
                         <button
+                        class="uppercase px-4 py-2 bg-purple-600 text-white max-w-max shadow-sm hover:shadow-md mx-4 my-2"
+                        @click="$router.push('/posts/editor/' + post.id)"
+                        >
+                        編集
+                        </button>
+                        <button
                         class="uppercase px-4 py-2 bg-gray-600 text-white max-w-max shadow-sm hover:shadow-md mx-4 my-2"
                         @click="delPost(post)"
                         >

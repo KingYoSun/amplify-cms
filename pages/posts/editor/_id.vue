@@ -58,6 +58,14 @@
                 記事のページに移動
                 </button>
             </div>
+            <div class="mt-3">
+                <button
+                class="uppercase px-8 py-2 bg-green-600 text-white max-w-max shadow-sm hover:shadow-md mr-2 mt-2"
+                @click="$router.back()"
+                >
+                戻る
+                </button>
+            </div>
         </div>
     </div>
 </template>
