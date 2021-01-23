@@ -16,7 +16,7 @@
                 >
                     <div class="col-span-3">
                         <div class="px-6 px-4">
-                            <div class="font-bold text-xl">{{ post.title }}</div>
+                            <a :href="'/posts/' + post.id" class="font-bold text-xl hover:text-gray-600">{{ post.title }}</a>
                             <p v-if="query.sort === 'createdAt'" class="text-gray-600 mb-2">投稿日時: {{ new Date(post.createdAt).toLocaleString() }}</p>
                             <p v-if="query.sort === 'updatedAt'" class="text-gray-600 mb-2">更新日時: {{ new Date(post.updatedAt).toLocaleString() }}</p>
                         </div>
@@ -42,6 +42,20 @@
                         @click="delPost(post)"
                         >
                         削除
+                        </button>
+                        <button
+                        v-if="post.draft"
+                        class="uppercase px-4 py-2 bg-teal-600 text-white max-w-max shadow-sm hover:shadow-md mx-4 my-2"
+                        @click="changeDraft(post, true)"
+                        >
+                        公開する
+                        </button>
+                        <button
+                        v-if="!post.draft"
+                        class="uppercase px-4 py-2 bg-indigo-600 text-white max-w-max shadow-sm hover:shadow-md mx-4 my-2"
+                        @click="changeDraft(post, false)"
+                        >
+                        非公開にする
                         </button>
                     </div>
                 </div>
@@ -375,6 +389,39 @@ import SearchForm from '~/components/searchForm.vue'
                 this.overlay = false
             }
         },
+        async changeDraft(post, boolean) {
+            if (boolean && !confirm("記事を公開してよろしいですか？")) {
+                return false
+            }
+            if (!boolean && !confirm("記事を非公開にしてよろしいですか？")) {
+                return false
+            }
+            try {
+                this.overlay = true
+                const updatePost = `
+                    mutation UpdatePost {
+                        updatePost(input: {
+                            id: "${post.id}",
+                            draft: ${!boolean},
+                            _version: ${post._version},
+                        }) {
+                            id
+                            draft
+                            _version
+                        }
+                    }
+                `
+                API.graphql(graphqlOperation(updatePost))
+                    .then(res => {
+                        this.overlay = false
+                        this.dialogMessage = (boolean)? "記事を公開しました" : "記事を非公開にしました"
+                        this.showDialog = true
+                    })
+            } catch (e) {
+                Common.failed(e, "公開状態の変更に失敗しました", this.overlay)
+                this.overlay = false
+            }
+        }
     }
  }
 </script>
