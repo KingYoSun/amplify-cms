@@ -22,7 +22,8 @@
                         OK
                     </button>
                     <button
-                    @click="calcel"
+                    v-if="cancel"
+                    @click="close"
                     class="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-gray-200 rounded-lg font-semibold text-sm mt-4 md:mt-0 md:order-1"
                     >
                         Cancel
@@ -68,7 +69,7 @@ export default {
         agree () {
             this.$emit("agree")
         },
-        calcel () {
+        close () {
             this.dialog = false
         }
     }

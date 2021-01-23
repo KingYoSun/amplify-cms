@@ -35,6 +35,10 @@ export default {
                     to: "/admin/",
                 },
                 {
+                    title: "記事一覧",
+                    to: "/admin/posts"
+                },
+                {
                     title: '記事投稿',
                     to: '/posts/editor/new',
                 }

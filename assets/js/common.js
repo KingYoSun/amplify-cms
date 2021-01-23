@@ -2,6 +2,12 @@ import API, { graphqlOperation } from '@aws-amplify/api'
 import Storage from '@aws-amplify/storage'
 import { moduleFileExtensions } from '~/jest.config'
 
+export function refresh () {
+    if (process.browser) {
+        window.location.reload(true)
+    }
+}
+
 export async function setImgFile (obj) {
     if (obj.imgURL !== null && obj.imgURL !== 'null') {
         try {
