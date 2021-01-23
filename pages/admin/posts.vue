@@ -69,6 +69,22 @@
                     </div>
                 </div>
             </div>
+            <div class="w-full my-4 flex flex-nowrap justify-center">
+                <button
+                :class="backBtnCls"
+                @click="backBtn"
+                :disabled="disableBackBtn"
+                >
+                    <span>前へ</span>
+                </button>
+                <button
+                :class="nextBtnCls"
+                :disabled="disableNextBtn"
+                @click="nextBtn"
+                >
+                    <span>次へ</span>
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -160,10 +176,22 @@ import SearchForm from '~/components/searchForm.vue'
     },
     computed: {
         disableBackBtn () {
-            return ((this.page -1 < 1) ? true : false)
+            return (this.page -1 < 1) ? true : false
+        },
+        backBtnCls () {
+            const clsBase = "uppercase px-4 py-2 text-white max-w-max mx-4 shadow-sm "
+            const clsEnable = "bg-teal-600 hover:shadow-md"
+            const clsDisable = "bg-teal-200 cursor-default"
+            return ((this.disableBackBtn) ? clsBase + clsDisable : clsBase + clsEnable)
         },
         disableNextBtn () {
             return ( ([null, "null", ""].indexOf(this.nextToken) !== -1 && this.postCount < this.postsPerPage) ? true : false )
+        },
+        nextBtnCls () {
+            const clsBase = "uppercase px-4 py-2 text-white max-w-max shadow-sm mx-4 "
+            const clsEnable ="bg-indigo-600 hover:shadow-md"
+            const clsDisable = "bg-indigo-200 cursor-default"
+            return ((this.disableNextBtn) ? clsBase + clsDisable : clsBase + clsEnable)
         }
     },
     watch: {
