@@ -9,6 +9,9 @@
         />
         <div class="w-full mx-6">
             <search-form class="my-4" />
+            <div class="w-full" style="text-align: right">
+                <nuxt-link to="/posts/editor/new" class="text-sm hover:text-gray-600 pr-4">記事を新規作成</nuxt-link>
+            </div>
             <div>
                 <div
                 v-for="(post, index) in posts" :key="index"
